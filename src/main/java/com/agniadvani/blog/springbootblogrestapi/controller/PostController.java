@@ -1,13 +1,12 @@
 package com.agniadvani.blog.springbootblogrestapi.controller;
 
 import com.agniadvani.blog.springbootblogrestapi.payload.PostDto;
+import com.agniadvani.blog.springbootblogrestapi.payload.PostResponse;
 import com.agniadvani.blog.springbootblogrestapi.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -26,8 +25,11 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
+    public ResponseEntity<PostResponse> getAllPosts(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ) {
+        return new ResponseEntity<>(postService.getAllPosts(pageNo, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
