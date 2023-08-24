@@ -42,6 +42,45 @@ public class CommentServiceImpl implements CommentService {
         return comments.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
     }
 
+    @Override
+    public CommentDto getCommentById(long postId, long commentId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "Id", commentId));
+
+        if (comment.getPost().getId() != post.getId()) {
+            throw new ResourceNotFoundException("Comment", "Id", commentId);
+        }
+        return mapToDto(comment);
+    }
+
+    @Override
+    public CommentDto updateCommentById(long postId, long commentId, CommentDto commentRequest) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "Id", commentId));
+
+        if (comment.getPost().getId() != post.getId()) {
+            throw new ResourceNotFoundException("Comment", "Id", commentId);
+        }
+
+        comment.setBody(commentRequest.getBody());
+        comment.setEmail(commentRequest.getEmail());
+        comment.setName(commentRequest.getName());
+        Comment updatedComment = commentRepository.save(comment);
+        return mapToDto(updatedComment);
+    }
+
+    @Override
+    public void deleteCommentById(long postId, long commentId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "Id", postId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment", "Id", commentId));
+
+        if (comment.getPost().getId() != post.getId()) {
+            throw new ResourceNotFoundException("Comment", "Id", commentId);
+        }
+
+        commentRepository.delete(comment);
+    }
+
 
     private CommentDto mapToDto(Comment comment) {
         return new CommentDto(comment.getId(), comment.getName(), comment.getEmail(), comment.getBody());
