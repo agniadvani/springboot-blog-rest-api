@@ -7,6 +7,7 @@ import com.agniadvani.blog.springbootblogrestapi.payload.CommentDto;
 import com.agniadvani.blog.springbootblogrestapi.repository.CommentRepository;
 import com.agniadvani.blog.springbootblogrestapi.repository.PostRepository;
 import com.agniadvani.blog.springbootblogrestapi.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,13 @@ public class CommentServiceImpl implements CommentService {
     private CommentRepository commentRepository;
     private PostRepository postRepository;
 
+    private ModelMapper modelMapper;
+
     @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, ModelMapper modelMapper) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -83,15 +87,10 @@ public class CommentServiceImpl implements CommentService {
 
 
     private CommentDto mapToDto(Comment comment) {
-        return new CommentDto(comment.getId(), comment.getName(), comment.getEmail(), comment.getBody());
+        return modelMapper.map(comment, CommentDto.class);
     }
 
     private Comment mapToEntity(CommentDto commentDto) {
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setBody(commentDto.getBody());
-        comment.setEmail(commentDto.getEmail());
-        comment.setName(commentDto.getName());
-        return comment;
+        return modelMapper.map(commentDto, Comment.class);
     }
 }
